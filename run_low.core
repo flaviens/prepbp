@@ -1,0 +1,55 @@
+CAPI=2:
+# Copyright Flavien Solt, ETH Zurich.
+# Licensed under the General Public License, Version 3.0, see LICENSE for details.
+# SPDX-License-Identifier: GPL-3.0-only
+name: "::run_low:0.1"
+description: "Run BlackParrot with FST traces"
+
+filesets:
+  files_cells:
+    files:
+      - src/bp_pickled.sv
+      - src/sram_mem.sv
+      - src/bp_tiny_soc_low.sv
+    file_type: systemVerilogSource
+
+  files_dv:
+    files:
+      - dv/common_functions.cc
+      - dv/elf.h : {is_include_file: true}
+      - dv/elfloader.cc
+      - dv/testbench.h : {is_include_file: true}
+      - dv/toplevel.cc
+    file_type: cppSource
+
+targets:
+  default:
+    default_tool: verilator
+    filesets:
+      - files_cells
+      - files_dv
+    toplevel: bp_tiny_soc
+    tools:
+      verilator:
+        mode: cc
+        verilator_options:
+          - '--trace'
+          - '--trace-fst'
+          - '--trace-structs'
+          - '--trace-params'
+          - '--trace-max-array 1024'
+          - '-CFLAGS "-std=c++11 -Wall -DTOPLEVEL_NAME=bp_tiny_soc -g -O0"'
+          - '-LDFLAGS "-pthread -lutil"'
+          - "-Wall"
+          - "-Wno-DECLFILENAME"
+          - "-Wno-PINCONNECTEMPTY"
+          - "-Wno-WIDTH"
+          - "-Wno-WIDTHCONCAT"
+          - "-Wno-UNSIGNED"
+          - "-Wno-UNUSED"
+          - "-Wno-CMPCONST"
+          - "-Wno-CASEINCOMPLETE"
+          - "-Wno-UNDRIVEN"
+          - "-Wno-SYNCASYNCNET"
+          - "-Wno-fatal"
+          - "-Wno-LITENDIAN"
